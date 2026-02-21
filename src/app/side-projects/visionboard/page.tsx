@@ -7,12 +7,14 @@ import { VisionCard } from '@/src/components/VisionCard';
 
 export default function VisionBoard() {
     const { items, addItem, updatePosition, bringToFront } = useVisionStore();
+    // 초기 마운트 상태 관리
     const [isMounted, setIsMounted] = useState(false);
 
+    // url 직접 입력 관리
     const [inputUrl, setInputUrl] = useState('');
     const [inputTitle, setInputTitle] = useState('');
     
-    // 🌟 파일 업로드 중인지 확인하는 상태 (버튼 비활성화용)
+    // 파일 업로드중 여부 체크
     const [isUploading, setIsUploading] = useState(false); 
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -46,7 +48,7 @@ export default function VisionBoard() {
         setInputTitle('');
     };
 
-    // 🚀 S3 Pre-signed URL을 이용한 찐 업로드 로직!
+    // s3 업로드 로직
     const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
@@ -115,7 +117,7 @@ export default function VisionBoard() {
                         isUploading ? 'bg-gray-300 cursor-not-allowed' : 'bg-[#D1C7B7] hover:bg-[#c2b6a3]'
                     } text-black px-4 py-2 rounded-lg transition-colors text-sm font-semibold whitespace-nowrap`}
                 >
-                    {isUploading ? '업로드 중... ⏳' : '📁 PC 이미지'}
+                    {isUploading ? '업로드 중... ⏳' : '이미지 업로드'}
                 </button>
 
                 <div className="w-px h-6 bg-gray-300 mx-2" />

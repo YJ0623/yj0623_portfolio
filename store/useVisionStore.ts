@@ -23,14 +23,13 @@ interface VisionStore {
     bringToFront: (id: string) => void;
 }
 
-let nextZindex = 1;
-
 export const useVisionStore = create<VisionStore>()(
     persist(
         (set) => ({
         items: [],
 
         addItem: (data) => set((state) => {
+            const maxZIndex = state.items.reduce((max, item) => Math.max(max, item.zIndex), 0);
             const isClient = typeof window !== 'undefined';
             const centerX = isClient ? window.innerWidth / 2 - 100 : 200;
             const centerY = isClient ? window.innerHeight / 2 - 100 : 200;
@@ -44,7 +43,7 @@ export const useVisionStore = create<VisionStore>()(
                         x: centerX + (Math.random() * 50 - 25),
                         y: centerY + (Math.random() * 50 - 25),
                         rotation: Math.random() * 20 - 10,
-                        zIndex: nextZindex++,
+                        zIndex: maxZIndex + 1,
                         width: 200,
                     }
                 ],
@@ -68,9 +67,9 @@ export const useVisionStore = create<VisionStore>()(
         })),
 
         bringToFront: (id) => set((state) => {
-            nextZindex++;
+            const maxZIndex = state.items.reduce((max, item) => Math.max(max, item.zIndex), 0);
             return {
-                items: state.items.map((item) => item.id === id ? { ...item, zIndex: nextZindex }: item),
+                items: state.items.map((item) => item.id === id ? { ...item, zIndex: maxZIndex + 1 }: item),
             }
         }),
     }),

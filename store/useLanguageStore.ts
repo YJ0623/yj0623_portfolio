@@ -15,7 +15,7 @@ export const translations = {
     projects: { title: 'Projects', viewMore: '상세 정보 보기' },
     additional: {
       title: 'Want to see my creative side?',
-      desc: "프론트엔드 개발자는 '보기 좋은 것'에 대해 잘 알고 있어야 한다고 생각합니다.\n개발뿐만 아니라, 미(美)에 관한 제 관점을 공유하고자 합니다.",
+      desc: "프론트엔드 개발자는 '보기 좋은 것'에 대해 잘 알고 있어야 한다고 생각합니다.\n이곳에서 제가 구상한 여러 작은 프로젝트들을 보실 수 있습니다.",
       btn: '다른 작업 보러가기',
     },
     footer: '© 2025 Hwang YoungJun. All rights reserved.',
