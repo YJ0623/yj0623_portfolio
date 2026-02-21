@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { Header } from "../components/layout/Header";
-import { Footer } from "../components/layout/Footer";
 import InteractiveCursor from "../components/InteractiveCursor";
 
 const geistSans = Geist({
@@ -27,14 +25,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <Header />
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <InteractiveCursor />
         {children}
       </body>
-      <Footer />
     </html>
   );
 }

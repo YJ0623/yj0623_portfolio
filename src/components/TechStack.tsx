@@ -2,9 +2,11 @@
 import { useState } from 'react';
 import { 
   SiHtml5, SiCss3, SiJavascript, SiReact, SiTypescript, SiTailwindcss, 
-  SiMysql, SiCplusplus, SiC 
+  SiMysql, SiCplusplus, SiC, 
+  SiNextdotjs,
+  SiZedindustries,
+  SiVercel
 } from 'react-icons/si';
-import { BsStars } from 'react-icons/bs'; // AI 아이콘용
 
 type Category = 'all' | 'frontend' | 'backend';
 
@@ -16,6 +18,8 @@ const techData = [
   { name: 'React', category: 'frontend', icon: <SiReact className="text-[#61DAFB]" /> },
   { name: 'TypeScript', category: 'frontend', icon: <SiTypescript className="text-[#3178C6]" /> },
   { name: 'Tailwind CSS', category: 'frontend', icon: <SiTailwindcss className="text-[#06B6D4]" /> },
+  { name: 'Next.js', category: 'frontend', icon: <SiNextdotjs className="text-[#000000]" /> },
+  { name: 'Vercel', category: 'frontend', icon: <SiVercel className="text-[#000000]" /> },
   // Backend
   { name: 'MySQL', category: 'backend', icon: <SiMysql className="text-[#4479A1]" /> },
   { name: 'C', category: 'backend', icon: <SiC className="text-[#A8B9CC]" /> },
@@ -40,7 +44,7 @@ export const TechStack = () => {
             <button
               key={option}
               onClick={() => setFilter(option as Category)}
-              className={`px-4 py-2 rounded-full capitalize transition-all duration-300 ${
+              className={`px-4 py-2 rounded-full capitalize transition-all duration-300  cursor-pointer ${
                 filter === option 
                   ? 'bg-white text-[#BF092F] shadow-sm font-bold' 
                   : 'text-gray-500 hover:text-gray-700'
@@ -63,8 +67,6 @@ export const TechStack = () => {
           </div>
         ))}
       </div>
-
-      
     </div>
   );
 };
