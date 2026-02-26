@@ -21,7 +21,7 @@ const containerVariants = {
 
 const itemVariants = {
   hidden: { y: 15, opacity: 0, scale: 0.2 },
-  visible: { y: 0, opacity: 1, scale: 1, transition: { type: 'spring', stiffness: 400, damping: 15 } },
+  visible: { y: 0, opacity: 1, scale: 1, transition: { type: 'spring' as const, stiffness: 400, damping: 15 } },
 };
 
 export default function GithubGrassWidget() {
