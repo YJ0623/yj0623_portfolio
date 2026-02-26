@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { CODING_STATS } from '@/src/constants/myStats';
+import Image from 'next/image';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -41,7 +42,7 @@ export default function CodingStatsWidget() {
               <div className="flex justify-between items-end">
                 <div className="flex items-center gap-2">
                   <div className={`w-6 h-6 rounded-md flex items-center justify-center text-white text-xs font-bold ${stat.color}`}>
-                    {stat.logo}
+                    <Image src={stat.logo} alt={stat.platform} className="w-4 h-4" />
                   </div>
                   <span className="font-semibold text-gray-700 text-sm">{stat.platform}</span>
                 </div>

@@ -5,7 +5,8 @@ import { useEffect, useState, useRef } from 'react';
 import { DndContext, DragEndEvent, DragStartEvent } from '@dnd-kit/core';
 import { VisionCard } from '@/src/components/VisionCard';
 import Image from 'next/image';
-import background_image from '../../assets/background_brown.jpg'
+import background_image from '../../assets/background_brown.jpg';
+import Link from 'next/link';
 
 export default function VisionBoard() {
     const { items, addItem, updatePosition, bringToFront } = useVisionStore();
@@ -15,9 +16,9 @@ export default function VisionBoard() {
     // url 직접 입력 관리
     const [inputUrl, setInputUrl] = useState('');
     const [inputTitle, setInputTitle] = useState('');
-    
+
     // 파일 업로드중 여부 체크
-    const [isUploading, setIsUploading] = useState(false); 
+    const [isUploading, setIsUploading] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
@@ -69,7 +70,7 @@ export default function VisionBoard() {
             });
 
             if (!res.ok) throw new Error('URL 발급에 실패했습니다.');
-            
+
             // url: S3에 업로드할 때 쓸 일회용 주소 / finalImageUrl: 영구 저장될 주소
             const { url, finalImageUrl } = await res.json();
 
@@ -103,12 +104,25 @@ export default function VisionBoard() {
     };
 
     return (
-        <div className="relative w-full h-screen overflow-hidden bg-[#F9F9F9]">
-            <h1 className='absolute top-5 left-1/3 font-gveret text-7xl z-1'>Vision Board</h1>
-            <Image src={background_image} alt="배경화면" className='object-cover z-0' fill/>
+        <div className="relative w-full h-screen overflow-hidden bg-[#F9F9F9] p-5">
+            <Link
+                href="/side-projects"
+                className="font-semibold text-2xl z-50 relative"
+            >
+                ← Back
+            </Link>
+            <h1 className="absolute top-5 left-1/3 font-gveret text-7xl z-1">
+                Vision Board
+            </h1>
+            <Image
+                src={background_image}
+                alt="배경화면"
+                className="object-cover z-0"
+                fill
+            />
             <div className="absolute bottom-4 right-4 z-50 bg-white p-4 rounded-xl shadow-md flex gap-2 items-center border border-gray-200">
-                <input 
-                    type="file" 
+                <input
+                    type="file"
                     accept="image/*"
                     className="hidden"
                     ref={fileInputRef}
@@ -118,7 +132,9 @@ export default function VisionBoard() {
                     onClick={() => fileInputRef.current?.click()}
                     disabled={isUploading} // 업로드 중이면 버튼 막기
                     className={`${
-                        isUploading ? 'bg-gray-300 cursor-not-allowed' : 'bg-[#D1C7B7] hover:bg-[#c2b6a3]'
+                        isUploading
+                            ? 'bg-gray-300 cursor-not-allowed'
+                            : 'bg-[#D1C7B7] hover:bg-[#c2b6a3]'
                     } text-black px-4 py-2 rounded-lg transition-colors text-sm font-semibold whitespace-nowrap`}
                 >
                     {isUploading ? '업로드 중... ⏳' : '이미지 업로드'}
