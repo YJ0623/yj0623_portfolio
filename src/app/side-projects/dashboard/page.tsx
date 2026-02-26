@@ -3,8 +3,8 @@ import GithubGrassWidget from '@/src/components/dashboard/GithubGrassWidget';
 
 export default function Home() {
     return (
-        <div>
-            <section className="py-12 px-6 max-w-5xl mx-auto">
+        <div className='flex mx-auto w-230 h-170 justify-center mt-20 border-3 border-gray-200 shadow-2xl rounded-[20px]'>
+            <section className="flex flex-col py-12 px-6">
                 <div className="mb-8">
                     <h2 className="text-2xl font-bold text-gray-800">
                         Developer Dashboard
@@ -14,7 +14,7 @@ export default function Home() {
                     </p>
                 </div>
 
-                <div className="flex flex-col md:flex-row gap-6 items-start">
+                <div className="flex flex-col md:flex-row items-start mt-10 gap-10">
                     <div className="flex-1">
                         <GithubGrassWidget />
                     </div>

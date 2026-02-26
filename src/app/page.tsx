@@ -110,7 +110,7 @@ export const MainPage = () => {
             {t.additional.desc}
           </p>
           <Link href={"/side-projects"} className='cursor-pointer'>
-          <button className="bg-white text-black px-8 py-4 rounded-full font-bold text-lg hover:bg-gray-100 transition shadow-lg">
+          <button className="bg-white text-black px-8 py-4 rounded-full font-bold text-lg hover:bg-gray-100 transition shadow-lg cursor-pointer">
               {t.additional.btn}
           </button>
           </Link>

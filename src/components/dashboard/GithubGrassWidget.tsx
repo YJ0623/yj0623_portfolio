@@ -50,7 +50,6 @@ export default function GithubGrassWidget() {
         <span className="text-xs text-gray-400 font-medium">Last 105 days</span>
       </div>
       
-      {/* 로딩 중일 때는 회색 스켈레톤, 완료되면 애니메이션 잔디 렌더링 */}
       {isLoading ? (
         <div className="grid grid-rows-7 grid-flow-col gap-[3px] animate-pulse">
           {Array.from({ length: 105 }).map((_, i) => (
@@ -75,7 +74,6 @@ export default function GithubGrassWidget() {
         </motion.div>
       )}
 
-      {/* 범례는 이전과 동일 */}
       <div className="mt-4 flex items-center justify-end gap-1 text-[10px] text-gray-500">
         <span>Less</span>
         <div className="w-2.5 h-2.5 rounded-[2px] bg-gray-100" />
