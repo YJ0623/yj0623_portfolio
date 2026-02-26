@@ -3,6 +3,7 @@
 
 @import "tailwindcss";
 
-@theme {
+@theme inline {
   --font-sans: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Malgun Gothic", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+  --font-gveret: var(--font-gveret-levin);
 }

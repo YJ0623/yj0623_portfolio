@@ -4,6 +4,8 @@ import { useVisionStore } from '@/store/useVisionStore';
 import { useEffect, useState, useRef } from 'react';
 import { DndContext, DragEndEvent, DragStartEvent } from '@dnd-kit/core';
 import { VisionCard } from '@/src/components/VisionCard';
+import Image from 'next/image';
+import background_image from '../../assets/background_brown.jpg'
 
 export default function VisionBoard() {
     const { items, addItem, updatePosition, bringToFront } = useVisionStore();
@@ -102,7 +104,9 @@ export default function VisionBoard() {
 
     return (
         <div className="relative w-full h-screen overflow-hidden bg-[#F9F9F9]">
-            <div className="absolute top-4 left-4 z-50 bg-white p-4 rounded-xl shadow-md flex gap-2 items-center border border-gray-200">
+            <h1 className='absolute top-5 left-1/3 font-gveret text-7xl z-1'>Vision Board</h1>
+            <Image src={background_image} alt="배경화면" className='object-cover z-0' fill/>
+            <div className="absolute bottom-4 right-4 z-50 bg-white p-4 rounded-xl shadow-md flex gap-2 items-center border border-gray-200">
                 <input 
                     type="file" 
                     accept="image/*"

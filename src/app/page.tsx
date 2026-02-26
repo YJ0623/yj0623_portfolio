@@ -1,14 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { useEffect, useState } from 'react';
-import { TechStack } from '../components/TechStack';
 import { useLanguageStore } from '@/store/useLanguageStore';
 import { ProjectData, projectsData } from '../constants/projectData';
 import Link from 'next/link';
 import Image from 'next/image';
+
+import { TechStack } from '../components/TechStack';
 import { Navbar } from '../components/layout/Navbar';
 import { TypingTitle } from '../components/TypingTitle';
 import { ProjectModal } from '../components/ProjectModal';
+
 import { BsLink45Deg } from 'react-icons/bs';
 
 // Main Page Layout

@@ -2,6 +2,12 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import InteractiveCursor from "../components/InteractiveCursor";
+import localFont from 'next/font/local'
+
+const gveretLevin = localFont({
+  src: './fonts/GveretLevin-Regular.ttf',
+  variable: '--font-gveret-levin',
+});
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,7 +32,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${gveretLevin.variable} ${geistMono.variable} antialiased`}
       >
         <InteractiveCursor />
         {children}
