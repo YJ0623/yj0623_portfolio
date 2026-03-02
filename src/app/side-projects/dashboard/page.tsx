@@ -1,5 +1,5 @@
 import CodingStatsWidget from '@/src/components/dashboard/CodingStatsWidget';
-import GithubGrassWidget from '@/src/components/dashboard/GithubGrassWidget';
+import GithubGrass from '@/src/components/dashboard/GithubGrass';
 import Link from 'next/link';
 
 export default function DashBoard() {
@@ -21,7 +21,7 @@ export default function DashBoard() {
 
                     <div className="flex flex-col md:flex-row items-start mt-10 gap-10">
                         <div className="flex-1">
-                            <GithubGrassWidget />
+                            <GithubGrass />
                         </div>
                         <div className="flex-1">
                             <CodingStatsWidget />
