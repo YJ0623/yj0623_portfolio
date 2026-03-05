@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import visionBoardImage from '../assets/visionBoard_capture.png';
 import dashBoardImage from '../assets/dashBoardImage.png';
+import magneticButtonImage from '../assets/blackhole.png';
 import Link from 'next/link';
 
 export default function SideProjects() {
@@ -56,9 +57,11 @@ export default function SideProjects() {
                                 href="/side-projects/magneticbutton"
                                 className="w-full h-full"
                             >
-                            <div className="flex w-full h-full items-center justify-center">
-                                마그네릭
-                            </div>
+                            <Image
+                                    src={magneticButtonImage}
+                                    alt="magnetic-button"
+                                    className="w-full h-full"
+                                />
                             <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex justify-center items-center">
                                 <span className="text-white text-2xl font-bold">
                                     Magnetic Button
