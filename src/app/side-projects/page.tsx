@@ -52,14 +52,19 @@ export default function SideProjects() {
                     </div>
                     <div className="relative flex bg-gray-100 w-100 h-80 border-3 border-white shadow-xl group">
                         <div className="w-full h-full">
+                            <Link
+                                href="/side-projects/magneticbutton"
+                                className="w-full h-full"
+                            >
                             <div className="flex w-full h-full items-center justify-center">
-                                ?
+                                마그네릭
                             </div>
                             <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex justify-center items-center">
                                 <span className="text-white text-2xl font-bold">
-                                    Comming Soon
+                                    Magnetic Button
                                 </span>
                             </div>
+                            </Link>
                         </div>
                     </div>
                     <div className="relative flex bg-gray-100 w-100 h-80 border-3 border-white shadow-xl group">
