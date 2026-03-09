@@ -5,6 +5,33 @@ import magneticButtonImage from '../assets/blackhole.png';
 import Link from 'next/link';
 
 export default function SideProjects() {
+    const projects = [
+        {
+            id: 'visionboard',
+            title: 'Vision Board',
+            href: '/side-projects/visionboard',
+            image: visionBoardImage,
+        },
+        {
+            id: 'dashboard',
+            title: 'Developer Dashboard',
+            href: '/side-projects/dashboard',
+            image: dashBoardImage,
+        },
+        {
+            id: 'magneticbutton',
+            title: 'Magnetic Button',
+            href: '/side-projects/magneticbutton',
+            image: magneticButtonImage,
+        },
+        {
+            id: 'hongik-map',
+            title: 'Hongik Map',
+            href: '/side-projects/hongik-map',
+            image: magneticButtonImage, // 수정해야 함
+        },
+    ];
+
     return (
         <div className="w-full min-h-screen bg-[#FFFBF1] p-5">
             <Link href="/" className="font-semibold text-2xl">
@@ -12,76 +39,24 @@ export default function SideProjects() {
             </Link>
             <div className="flex items-center">
                 <div className="mt-10 grid grid-cols-2 gap-15 mx-auto">
-                    <div className="relative flex bg-gray-100 w-100 h-80 border-3 border-white shadow-xl group">
-                        <div className="w-full h-full">
-                            <Link
-                                href="/side-projects/visionboard"
-                                className="w-full h-full"
-                            >
-                                <Image
-                                    src={visionBoardImage}
-                                    alt="vision-board"
-                                    className="w-full h-full"
-                                />
-                                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex justify-center items-center">
-                                    <span className="text-white text-2xl font-bold">
-                                        Vision Board
-                                    </span>
-                                </div>
-                            </Link>
-                        </div>
-                    </div>
-
-                    <div className="relative flex justify-center items-center bg-gray-100 w-100 h-80 border-3 border-white shadow-xl group">
-                        <div className="w-full h-full">
-                            <Link
-                                href="/side-projects/dashboard"
-                                className="w-full h-full"
-                            >
-                                <Image
-                                    src={dashBoardImage}
-                                    alt="developer-dashboard"
-                                    className="w-full h-full"
-                                />
-                                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex justify-center items-center">
-                                    <span className="text-white text-2xl font-bold">
-                                        Developer Dashboard
-                                    </span>
-                                </div>
-                            </Link>
-                        </div>
-                    </div>
-                    <div className="relative flex bg-gray-100 w-100 h-80 border-3 border-white shadow-xl group">
-                        <div className="w-full h-full">
-                            <Link
-                                href="/side-projects/magneticbutton"
-                                className="w-full h-full"
-                            >
+                    {projects.map((project) => (
+                        <Link
+                        key={project.id}
+                        href={project.href}
+                        className='group relative flex bg-gray-100 w-100 h-80 border-3 border-white shadow-xl'
+                        >
                             <Image
-                                    src={magneticButtonImage}
-                                    alt="magnetic-button"
-                                    className="w-full h-full"
-                                />
-                            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex justify-center items-center">
-                                <span className="text-white text-2xl font-bold">
-                                    Magnetic Button
-                                </span>
-                            </div>
-                            </Link>
+                            src={project.image}
+                            alt={project.title}
+                            className="w-full h-full"
+                            />
+                            <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                            <span className="text-2xl font-bold text-white">
+                                {project.title}
+                            </span>
                         </div>
-                    </div>
-                    <div className="relative flex bg-gray-100 w-100 h-80 border-3 border-white shadow-xl group">
-                        <div className="w-full h-full">
-                            <div className="flex w-full h-full items-center justify-center">
-                                ?
-                            </div>
-                            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex justify-center items-center">
-                                <span className="text-white text-2xl font-bold">
-                                    Comming Soon
-                                </span>
-                            </div>
-                        </div>
-                    </div>
+                        </Link>
+                    ))}
                 </div>
             </div>
         </div>
