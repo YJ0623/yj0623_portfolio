@@ -1,7 +1,9 @@
+import NaverMap from '@/src/components/NaverMap';
+
 export default function HongikMap() {
     return (
-        <div>
-            
-        </div>
-    )
+        <main>
+            <NaverMap />
+        </main>
+    );
 }
