@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import InteractiveCursor from "../components/InteractiveCursor";
 import localFont from 'next/font/local'
+import Script from "next/script";
 
 const gveretLevin = localFont({
   src: './fonts/GveretLevin-Regular.ttf',
