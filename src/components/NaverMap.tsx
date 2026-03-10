@@ -1,61 +1,79 @@
 'use client';
 
+import { useRestaurantStore } from '@/store/useRestaurantStore';
 import Script from 'next/script';
 import { useEffect, useRef, useState } from 'react';
 
-// dummy data
-const RESTAURANTS = [
-    { id: 1, name: '카미야 (돈카츠)', lat: 37.5532, lng: 126.9235 },
-    { id: 2, name: '칸다소바 (마제소바)', lat: 37.5485, lng: 126.9205 },
-    { id: 3, name: '윤씨밀방 (함박스테이크)', lat: 37.5492, lng: 126.923 },
-    { id: 4, name: '우동카덴 (우동)', lat: 37.5513, lng: 126.9145 },
-    { id: 5, name: '진진 (중식당)', lat: 37.5555, lng: 126.915 },
+declare global {
+    interface Window {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        naver: any;
+    }
+}
+
+const mockupData = [
+    {
+        id: 'restaurant1',
+        name: '맛집 1',
+        lat: 37.5518,
+        lng: 126.92,
+    },
+    {
+        id: 'restaurant2',
+        name: '맛집 2',
+        lat: 37.5528,
+        lng: 126.915,
+    },
+    {
+        id: 'restaurant3',
+        name: '맛집 3',
+        lat: 37.5538,
+        lng: 126.93,
+    },
 ];
 
 export default function NaverMap() {
     const mapElement = useRef<HTMLDivElement>(null);
     const [isLoaded, setIsLoaded] = useState(false);
 
-    useEffect(() => {
-        if (!isLoaded || !mapElement.current || !window.naver) return;
+    const setSelectedRestaurant = useRestaurantStore((state) => state.setSelectedRestaurant);
 
-        const center = new window.naver.maps.LatLng(37.5502, 126.9248);
-        const mapOptions: naver.maps.MapOptions = {
-            center: center,
+    useEffect(() => {
+        if (!mapElement.current || !isLoaded || !window.naver) return;
+
+        const mapOptions = {
+            center: new naver.maps.LatLng(37.5518, 126.925),
             zoom: 15,
-            minZoom: 10,
+            logoControl: false,
+            mapDataControl: false,
+            scaleControl: false,
         };
 
-        const map = new window.naver.maps.Map(mapElement.current, mapOptions);
+        const map = new naver.maps.Map(mapElement.current, mapOptions);
 
-        RESTAURANTS.forEach((shop) => {
-            const position = new window.naver.maps.LatLng(shop.lat, shop.lng);
-            const marker = new window.naver.maps.Marker({
-                map: map,
-                position: position,
-                title: shop.name,
+        mockupData.forEach((item) => {
+            const marker = new naver.maps.Marker({
+                position: new naver.maps.LatLng(item.lat, item.lng),
+                map,
+                title: item.name,
+                cursor: 'pointer',
+                clickable: true,
             });
 
-            window.naver.maps.Event.addListener(marker, 'click', () => {
-                console.log(`클릭된 맛집: ${shop.name}`);
+            naver.maps.Event.addListener(marker, 'click', () => {
+                setSelectedRestaurant(item);
             });
         });
     }, [isLoaded]);
 
     return (
-        <>
+        <div className="relative w-full h-screen">
             <Script
                 strategy="afterInteractive"
                 src={`https://openapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=${process.env.NEXT_PUBLIC_NAVER_CLIENT_ID}`}
                 onReady={() => setIsLoaded(true)}
             />
-            {!isLoaded && (
-                <div className="w-full h-screen bg-gray-100 flex items-center justify-center">
-                    지도를 불러오는 중입니다...
-                </div>
-            )}
-
             <div ref={mapElement} className="w-full h-screen relative" />
-        </>
+        </div>
     );
 }
