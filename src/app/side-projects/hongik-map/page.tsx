@@ -65,7 +65,6 @@ export default function HongikMapHome() {
                 </Link>
             </section>
 
-            {/* 2. 좋아요 랭킹 TOP 3 영역 */}
             <section className="px-4 mt-8">
                 <h2 className="text-lg font-bold mb-4">이번 주 리뷰 TOP 3</h2>
                 <div className="flex flex-col gap-3">
@@ -83,7 +82,6 @@ export default function HongikMapHome() {
                 </div>
             </section>
 
-            {/* 3. 최신 리뷰 영역 */}
             <section className="px-4 mt-8">
                 <h2 className="text-lg font-bold mb-4">
                     방금 올라온 핫한 리뷰
