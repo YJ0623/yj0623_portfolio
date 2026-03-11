@@ -25,12 +25,12 @@ export default function SearchPage() {
         <main className="min-h-screen bg-white">
             <form
                 onSubmit={handleSearch}
-                className="flex items-center px-4 py-3 border-b"
+                className="flex items-center flex-nowrap px-4 py-3 border-b"
             >
                 <button
                     type="button"
                     onClick={() => router.push('/side-projects/hongik-map')}
-                    className="text-gray-500 hover:text-gray-700 transition"
+                    className="text-gray-500 text-[12px] hover:text-gray-700 transition shrink-0"
                 >
                     뒤로가기
                 </button>
@@ -38,12 +38,12 @@ export default function SearchPage() {
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="가게 이름이나 키워드를 입력하세요"
+                    placeholder="가게 이름을 입력하세요"
                     className="flex-1 mx-4 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
                 <button
                     type="submit"
-                    className="bg-[#5478FF] text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition"
+                    className="bg-[#5478FF] text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition text-[12px] shrink-0"
                 >
                     검색
                 </button>

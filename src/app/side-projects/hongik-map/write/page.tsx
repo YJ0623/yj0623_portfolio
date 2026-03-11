@@ -131,18 +131,18 @@ export default function ReviewWritePage() {
                 <div className="bg-white min-h-screen">
                     <form
                         onSubmit={handleSearch}
-                        className="flex items-center px-4 py-3 border-b border-gray-300"
+                        className="flex flex-nowrap items-center px-4 py-3 border-b border-gray-300"
                     >
                         <input
                             type="text"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             placeholder="리뷰를 작성할 가게를 검색하세요!"
-                            className="flex-1 mx-4 px-4 py-2 border rounded-full border-gray-300"
+                            className="flex-1 mr-3 px-4 py-2 border rounded-full border-gray-300 min-w-0"
                         />
                         <button
                             type="submit"
-                            className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition"
+                            className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition shrink-0 whitespace-nowrap"
                         >
                             검색
                         </button>
