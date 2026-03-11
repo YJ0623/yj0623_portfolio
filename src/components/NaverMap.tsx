@@ -2,6 +2,7 @@
 'use client';
 
 import { useRestaurantStore } from '@/store/useRestaurantStore';
+import { supabase } from '@/utils/supabase';
 import Script from 'next/script';
 import { useEffect, useRef, useState } from 'react';
 
@@ -12,38 +13,53 @@ declare global {
     }
 }
 
-const mockupData = [
-    {
-        id: 'restaurant1',
-        name: '맛집 1',
-        lat: 37.5518,
-        lng: 126.92,
-    },
-    {
-        id: 'restaurant2',
-        name: '맛집 2',
-        lat: 37.5528,
-        lng: 126.915,
-    },
-    {
-        id: 'restaurant3',
-        name: '맛집 3',
-        lat: 37.5538,
-        lng: 126.93,
-    },
-];
-
 export default function NaverMap() {
     const mapElement = useRef<HTMLDivElement>(null);
     const [isLoaded, setIsLoaded] = useState(false);
     const mapInstance = useRef<any>(null);
     const searchMarker = useRef<any>(null);
-    const { selectedRestaurant, setSelectedRestaurant, clearRestaurant } =
-        useRestaurantStore();
+    const [dbMarkers, setDbMarkers] = useState<any[]>([]);
+    const { selectedRestaurant, setSelectedRestaurant } = useRestaurantStore();
+
+    // 네이버지도 api에서 mapx, mapy를 전달할 때에는 네이버만의 규격에 맞춘 1천만이 넘어가는 숫자를 제공합니다.
+    // 따라서 geocoding을 이용하지 않고 해당 좌표를 변환하기 위한 함수를 따로 작성하였습니다.
+    const getLatLng = (lat: number, lng: number) => {
+        // 1. 최신 스펙: 1천만 이상 (위경도 * 10,000,000)
+        if (lat > 10000000) {
+            return new window.naver.maps.LatLng(lat / 10000000, lng / 10000000);
+        } 
+        // 2. 과거 스펙: 1천 이상 ~ 1천만 미만 (TM128)
+        else if (lat > 1000) {
+            const tm128 = new window.naver.maps.Point(lng, lat);
+            return window.naver.maps.TransCoord.fromTM128ToLatLng(tm128);
+        } 
+        // 3. 정상 위경도 (37.xxx, 126.xxx)
+        return new window.naver.maps.LatLng(lat, lng);
+    };
+
+    useEffect(() => {
+        const fetchMarkers = async () => {
+            const { data, error } = await supabase
+                .from('reviews')
+                .select('restaurant_id, restaurant_name, lat, lng')
+                .eq('status', 'APPROVED');
+
+            // 가게 ID 기준으로 중복 제거
+            if (data) {
+                const uniqueRestaurants = Array.from(
+                    new Map(
+                        data.map((item) => [item.restaurant_id, item])
+                    ).values()
+                );
+                setDbMarkers(uniqueRestaurants);
+            }
+        };
+
+        fetchMarkers();
+    }, []);
 
     useEffect(() => {
         if (!mapElement.current || !isLoaded || !window.naver) return;
-
         if (mapInstance.current) return;
 
         const mapOptions = {
@@ -54,44 +70,43 @@ export default function NaverMap() {
             scaleControl: false,
         };
 
-        const map = new naver.maps.Map(mapElement.current, mapOptions);
-        mapInstance.current = map;
+        mapInstance.current = new naver.maps.Map(
+            mapElement.current,
+            mapOptions
+        );
+    }, [isLoaded]);
 
-        mockupData.forEach((item) => {
-            const marker = new naver.maps.Marker({
-                position: new naver.maps.LatLng(item.lat, item.lng),
-                map,
-                title: item.name,
+    useEffect(() => {
+        if (!mapElement.current || !isLoaded || dbMarkers.length === 0) return;
+
+        dbMarkers.forEach((place) => {
+            const position = getLatLng(Number(place.lat), Number(place.lng));
+
+            const marker = new window.naver.maps.Marker({
+                position: position,
+                map: mapInstance.current,
+                title: place.restaurant_name,
                 cursor: 'pointer',
                 clickable: true,
             });
 
-            naver.maps.Event.addListener(marker, 'click', () => {
-                setSelectedRestaurant(item);
+            window.naver.maps.Event.addListener(marker, 'click', () => {
+                setSelectedRestaurant({
+                    id: place.restaurant_id,
+                    name: place.restaurant_name,
+                    lat: Number(place.lat),
+                    lng: Number(place.lng),
+                });
+                
+                mapInstance.current.panTo(position);
             });
         });
-    }, [isLoaded]);
+    }, [isLoaded, dbMarkers]);
 
     useEffect(() => {
-        if (!mapInstance.current || !window.naver || !selectedRestaurant)
-            return;
+        if (!mapInstance.current || !window.naver || !selectedRestaurant) return;
 
-        let targetLatLng;
-        const rawLat = selectedRestaurant.lat;
-        const rawLng = selectedRestaurant.lng;
-
-        if (rawLat > 10000000) {
-            targetLatLng = new window.naver.maps.LatLng(
-                rawLat / 10000000,
-                rawLng / 10000000
-            );
-        } else if (rawLat > 1000) {
-            const tm128 = new window.naver.maps.Point(rawLng, rawLat);
-            targetLatLng =
-                window.naver.maps.TransCoord.fromTM128ToLatLng(tm128);
-        } else {
-            targetLatLng = new window.naver.maps.LatLng(rawLat, rawLng);
-        }
+        const targetLatLng = getLatLng(Number(selectedRestaurant.lat), Number(selectedRestaurant.lng));
 
         mapInstance.current.panTo(targetLatLng);
 
@@ -103,8 +118,8 @@ export default function NaverMap() {
             position: targetLatLng,
             map: mapInstance.current,
         });
-    }, [isLoaded, selectedRestaurant]);
 
+    }, [selectedRestaurant, isLoaded]);
     return (
         <div className="relative w-full h-screen">
             <Script

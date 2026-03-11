@@ -73,11 +73,13 @@ export default function ReviewWritePage() {
                     content: content,
                     status: 'PENDING',
                     image_urls: uploadedUrls,
+                    lat: Number(selectedPlace.mapy),
+                    lng: Number(selectedPlace.mapx),
                 },
             ]);
 
             if (dbError) throw dbError;
-            alert('리뷰를 등록해주셔서 감사합니다! 검수 후 노출됩니다.');
+            alert('리뷰를 등록해주셔서 감사합니다! 리뷰는 검수 후 바로 등록됩니다.');
 
             setSelectedPlace(null);
             setRating(0);
