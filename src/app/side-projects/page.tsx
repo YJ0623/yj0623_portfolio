@@ -2,6 +2,7 @@ import Image from 'next/image';
 import visionBoardImage from '../assets/visionBoard_capture.png';
 import dashBoardImage from '../assets/dashBoardImage.png';
 import magneticButtonImage from '../assets/blackhole.png';
+import hongikMapImage from '../assets/hongikMapImage.png';
 import Link from 'next/link';
 
 export default function SideProjects() {
@@ -28,7 +29,7 @@ export default function SideProjects() {
             id: 'hongik-map',
             title: 'Hongik Map',
             href: '/side-projects/hongik-map',
-            image: magneticButtonImage, // 수정해야 함
+            image: hongikMapImage,
         },
     ];
 
