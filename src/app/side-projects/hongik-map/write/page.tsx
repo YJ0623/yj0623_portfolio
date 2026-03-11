@@ -1,21 +1,106 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
+import { supabase } from '@/utils/supabase';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 export default function ReviewWritePage() {
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState<any[]>([]);
     const [selectedPlace, setSelectedPlace] = useState<any | null>(null);
-
+    const router = useRouter();
     const [rating, setRating] = useState(0);
     const [content, setContent] = useState('');
+    const [photos, setPhotos] = useState<File[]>([]);
 
     const handleSearch = async (e: React.FormEvent) => {
         e.preventDefault();
         const res = await fetch(`/api/search?query=${searchQuery}`);
         const data = await res.json();
         setSearchResults(data.items || []);
+    };
+
+    const handleRemovePhoto = (indexToRemove: number) => {
+        setPhotos(photos.filter((_, index) => index !== indexToRemove));
+    };
+
+    const handleSubmitReview = async () => {
+        if (rating === 0) {
+            alert('별점을 선택해주세요!');
+            return;
+        }
+        if (content.trim() === '') {
+            alert('리뷰 내용을 작성해 주세요!');
+            return;
+        }
+
+        const cleanTitle = selectedPlace.title.replace(/<[^>]*>?/g, '');
+        const addressId = selectedPlace.roadAddress || selectedPlace.address;
+
+        try {
+            let uploadedUrls: string[] = [];
+
+            if (photos.length > 0) {
+                const uploadPromises = photos.map(async (file) => {
+                    const fileExt = file.name.split('.').pop();
+                    const randomString = Math.random()
+                        .toString(36)
+                        .substring(2, 9);
+                    const uniqueFileName = `${Date.now()}_${randomString}.${fileExt}`;
+
+                    const { data, error: uploadError } = await supabase.storage
+                        .from('review_photos')
+                        .upload(uniqueFileName, file);
+
+                    if (uploadError) throw uploadError;
+
+                    const { data: publicUrlData } = supabase.storage
+                        .from('review_photos')
+                        .getPublicUrl(uniqueFileName);
+
+                    return publicUrlData.publicUrl;
+                });
+
+                uploadedUrls = await Promise.all(uploadPromises);
+            }
+            const { error: dbError } = await supabase.from('reviews').insert([
+                {
+                    restaurant_id: addressId,
+                    restaurant_name: cleanTitle,
+                    rating: rating,
+                    content: content,
+                    status: 'PENDING',
+                    image_urls: uploadedUrls,
+                },
+            ]);
+
+            if (dbError) throw dbError;
+            alert('리뷰를 등록해주셔서 감사합니다! 검수 후 노출됩니다.');
+
+            setSelectedPlace(null);
+            setRating(0);
+            setContent('');
+            setPhotos([]);
+            router.push('/side-projects/hongik-map');
+        } catch (error) {
+            console.error(error);
+            alert('리뷰 등록 중 오류가 발생했습니다. 관리자에게 문의해주세요.');
+        }
+    };
+
+    const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const files = Array.from(e.target.files || []);
+
+        const combinedFiles = [...photos, ...files];
+
+        if (files.length > 3) {
+            alert('사진은 최대 3장까지만 업로드 가능합니다!');
+            setPhotos(combinedFiles.slice(0, 3));
+        } else {
+            setPhotos(combinedFiles);
+        }
     };
 
     return (
@@ -104,8 +189,53 @@ export default function ReviewWritePage() {
 
                     <div className="mb-6 bg-white p-4 rounded-xl shadow-sm">
                         <label className="block font-bold mb-2">
+                            사진 첨부 (최대 3장)
+                        </label>
+                        <input
+                            type="file"
+                            multiple
+                            accept="image/*"
+                            onChange={handlePhotoChange}
+                            className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition"
+                        />
+
+                        {photos.length > 0 && (
+                            <div className="flex gap-3 mt-4 overflow-x-auto pb-2 pt-3 pr-3">
+                                {photos.map((file, index) => (
+                                    <div
+                                        key={index}
+                                        className="relative w-24 h-24 flex-shrink-0"
+                                    >
+                                        <Image
+                                            src={URL.createObjectURL(file)}
+                                            alt="미리보기"
+                                            className="mt-2 object-cover rounded-lg border border-gray-200"
+                                            width={96}
+                                            height={96}
+                                        />
+
+                                        <button
+                                            type="button"
+                                            onClick={() =>
+                                                handleRemovePhoto(index)
+                                            }
+                                            className="absolute -top-2 -right-2 bg-red-500 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shadow-sm hover:bg-red-600 transition"
+                                        >
+                                            ✕
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="mb-6 bg-white p-4 rounded-xl shadow-sm">
+                        <label className="block font-bold mb-2">
                             리뷰를 남겨주세요!
-                            <p className='text-sm text-gray-500'>*단, 허위 사실을 게시하거나 비방 목적으로 게시할 시 <br/> 별도의 안내 없이 삭제됩니다.</p>
+                            <p className="text-sm text-gray-500">
+                                *단, 허위 사실을 게시하거나 비방 목적으로 게시할
+                                시 <br /> 별도의 안내 없이 삭제됩니다.
+                            </p>
                         </label>
                         <textarea
                             value={content}
@@ -115,7 +245,10 @@ export default function ReviewWritePage() {
                         />
                     </div>
 
-                    <button className="w-full bg-blue-600 text-white font-bold py-4 rounded-xl hover:bg-blue-700 transition">
+                    <button
+                        className="w-full bg-blue-600 text-white font-bold py-4 rounded-xl hover:bg-blue-700 transition"
+                        onClick={handleSubmitReview}
+                    >
                         리뷰 등록하기
                     </button>
                 </div>

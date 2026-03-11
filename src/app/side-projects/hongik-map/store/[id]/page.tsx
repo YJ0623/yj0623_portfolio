@@ -1,10 +1,35 @@
 'use client';
 
+import { supabase } from '@/utils/supabase';
 import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 export default function StoreDetailPage({ params }: { params: { id: string } }) {
     const router = useRouter();
-    const storeId = params.id; 
+    const storeId = decodeURIComponent(params.id);
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const [reviews, setReviews] = useState<any>([]);
+    const [isLoading, setIsLoading] = useState(true);
+
+    {/* supabase 사용 코드 */}
+    useEffect(() => {
+        const fetchReviews = async () => {
+            try {
+                const {data, error} = await supabase.from('reviews').select('*').eq('restaurant_id', storeId).eq('status', 'APPROVED').order('created_at', { ascending: false });
+                if(error) throw error;
+                setReviews(data || []);
+            }
+            catch(error) {
+                console.error('리뷰 불러오기 실패', error);
+            }
+            finally {
+                setIsLoading(false);
+            }
+        }
+
+        fetchReviews();
+    }, [storeId])
 
     return (
         <main className="min-h-screen bg-white">
