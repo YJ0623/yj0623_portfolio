@@ -84,7 +84,7 @@ export default function HongikMapHome() {
 
             <section className="px-4 mt-8">
                 <h2 className="text-lg font-bold mb-4">
-                    방금 올라온 핫한 리뷰
+                    가장 최근 올라온 리뷰를 둘러보세요
                 </h2>
                 <div className="flex flex-col gap-4">
                     {RECENT_REVIEWS.map((review) => (
