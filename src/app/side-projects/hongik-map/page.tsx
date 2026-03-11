@@ -2,6 +2,7 @@
 'use client';
 
 import { supabase } from '@/utils/supabase';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
@@ -13,6 +14,7 @@ export default function HongikMapHome() {
     useEffect(() => {
         const fetchHomeData = async () => {
             try {
+                // 최근 리뷰 3개
                 const { data: recentData, error: recentError } = await supabase
                     .from('reviews')
                     .select('*')
@@ -22,18 +24,33 @@ export default function HongikMapHome() {
 
                 if (recentError) throw recentError;
 
-                const { data: topData, error: topError } = await supabase
-                    .from('reviews')
-                    .select('*')
-                    .eq('status', 'APPROVED')
-                    .order('rating', { ascending: false })
-                    .order('created_at', { ascending: false })
-                    .limit(3);
+                // 좋아요 많은순
+                const { data: allApprovedData, error: topError } =
+                    await supabase
+                        .from('reviews')
+                        .select('*')
+                        .eq('status', 'APPROVED');
 
                 if (topError) throw topError;
 
+                const sortedByLikes = (allApprovedData || [])
+                    .sort((a, b) => {
+                        const aLikes = a.liked_users ? a.liked_users.length : 0;
+                        const bLikes = b.liked_users ? b.liked_users.length : 0;
+
+                        // 좋아요 수가 같으면 최신순으로 정렬
+                        if (bLikes === aLikes) {
+                            return (
+                                new Date(b.created_at).getTime() -
+                                new Date(a.created_at).getTime()
+                            );
+                        }
+                        return bLikes - aLikes;
+                    })
+                    .slice(0, 3);
+
                 setRecentReviews(recentData || []);
-                setTopReviews(topData || []);
+                setTopReviews(sortedByLikes);
             } catch (error) {
                 console.error('홈 데이터 불러오기 실패:', error);
             } finally {
@@ -46,7 +63,7 @@ export default function HongikMapHome() {
 
     return (
         <main className="min-h-screen bg-gray-50 pb-24">
-            <section className="bg-blue-500 px-4 pt-6 pb-6 shadow-md rounded-b-3xl">
+            <section className="bg-[#5478FF] px-4 pt-6 pb-6 shadow-md rounded-b-3xl">
                 <h1 className="font-bold text-white text-lg mb-4 ml-1">
                     홍대생들의 찐 맛집을 공유해주세요!
                 </h1>
@@ -62,27 +79,53 @@ export default function HongikMapHome() {
                 </Link>
             </section>
 
-            {/* 리뷰에 달린 좋아요 수로 바꿔야 합니다. */}
             <section className="px-4 mt-8">
                 <h2 className="text-lg font-bold mb-4">이번 주 리뷰 TOP 3</h2>
 
                 {isLoading ? (
-                    <div className="text-center py-10 text-gray-400">데이터를 불러오는 중...</div>
+                    <div className="text-center py-10 text-gray-400">
+                        데이터를 불러오는 중...
+                    </div>
                 ) : (
                     <div className="flex flex-col gap-3">
-                        {topReviews.map((store) => (
-                            <div
-                                key={store.id}
-                                className="bg-white p-4 rounded-lg shadow-sm"
-                            >
-                                <div className="flex justify-between items-center mb-2">
-                                    <h3 className="font-bold">{store.restaurant_name}</h3>
-                                    <span className="text-yellow-500 text-sm tracking-widest">
-                                        {'★'.repeat(store.rating)}
-                                    </span>
+                        {topReviews.map((store) => {
+                            const likeCount = store.liked_users
+                                ? store.liked_users.length
+                                : 0;
+
+                            return (
+                                <div
+                                    key={store.id}
+                                    className="bg-white p-4 rounded-lg shadow-sm flex gap-4"
+                                >
+                                    {/* 썸네일 영역 추가 */}
+                                    <div className="relative w-16 h-16 bg-gray-100 rounded-lg shrink-0 overflow-hidden flex items-center justify-center">
+                                        {store.image_urls &&
+                                        store.image_urls.length > 0 ? (
+                                            <Image
+                                                src={store.image_urls[0]}
+                                                alt="가게 사진"
+                                                sizes='64px'
+                                                fill
+                                                className="object-cover"
+                                            />
+                                        ) : (
+                                            <span className="text-xl">🍽️</span>
+                                        )}
+                                    </div>
+
+                                    <div className="flex flex-col justify-center flex-1">
+                                        <h3 className="font-bold text-gray-900 line-clamp-1">
+                                            {store.restaurant_name}
+                                        </h3>
+                                        {/* 별점 대신 좋아요 수 표시 */}
+                                        <p className="text-sm text-gray-500 mt-1 font-medium">
+                                            {likeCount}명이 이 리뷰를 좋아했어요.
+                                        </p>
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 )}
             </section>
@@ -91,27 +134,48 @@ export default function HongikMapHome() {
                 <h2 className="text-lg font-bold mb-4">
                     가장 최근 올라온 리뷰를 둘러보세요
                 </h2>
-                
+
                 {isLoading ? (
-                    <div className="text-center py-10 text-gray-400">데이터를 불러오는 중...</div>
+                    <div className="text-center py-10 text-gray-400">
+                        데이터를 불러오는 중...
+                    </div>
                 ) : (
                     <div className="flex flex-col gap-4">
-                        {recentReviews.map((review) => (
-                            <div
-                                key={review.id}
-                                className="bg-white p-4 rounded-lg shadow-sm"
-                            >
-                                <div className="flex justify-between items-center mb-2">
-                                    <h3 className="font-bold">{review.restaurant_name}</h3>
-                                    <span className="text-yellow-500 text-sm tracking-widest">
-                                        {'★'.repeat(review.rating)}
-                                    </span>
+                        {recentReviews.map((review) => {
+                            return (
+                                <div
+                                    key={review.id}
+                                    className="bg-white p-4 rounded-lg shadow-sm flex gap-4"
+                                >
+                                    {/* 썸네일 영역 추가 */}
+                                    <div className="relative w-16 h-16 bg-gray-100 rounded-lg shrink-0 overflow-hidden flex items-center justify-center">
+                                        {review.image_urls &&
+                                        review.image_urls.length > 0 ? (
+                                            <Image
+                                                src={review.image_urls[0]}
+                                                alt="리뷰 사진"
+                                                fill
+                                                sizes='64px'
+                                                className='object-cover'
+                                            />
+                                        ) : (
+                                            <span className="text-xl">🍽️</span>
+                                        )}
+                                    </div>
+
+                                    <div className="flex flex-col justify-center flex-1">
+                                        <div className="flex justify-between items-start mb-1">
+                                            <h3 className="font-bold text-gray-900 line-clamp-1">
+                                                {review.restaurant_name}
+                                            </h3>
+                                        </div>
+                                        <p className="text-gray-600 text-sm line-clamp-2">
+                                            {review.content}
+                                        </p>
+                                    </div>
                                 </div>
-                                <p className="text-gray-600 text-sm line-clamp-2">
-                                    {review.content}
-                                </p>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 )}
             </section>

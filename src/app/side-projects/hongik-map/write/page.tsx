@@ -1,10 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
+import imageCompression from 'browser-image-compression';
 import { supabase } from '@/utils/supabase';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export default function ReviewWritePage() {
     const [searchQuery, setSearchQuery] = useState('');
@@ -12,8 +13,19 @@ export default function ReviewWritePage() {
     const [selectedPlace, setSelectedPlace] = useState<any | null>(null);
     const router = useRouter();
     const [rating, setRating] = useState(0);
+    const [hoverRating, setHoverRating] = useState(0);
     const [content, setContent] = useState('');
     const [photos, setPhotos] = useState<File[]>([]);
+    const [previewUrls, setPreviewUrls] = useState<string[]>([]);
+
+    useEffect(() => {
+        const newUrls = photos.map((file) => URL.createObjectURL(file));
+        setPreviewUrls(newUrls);
+
+        return () => {
+            newUrls.forEach((url) => URL.revokeObjectURL(url));
+        };
+    }, [photos]);
 
     const handleSearch = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -44,7 +56,13 @@ export default function ReviewWritePage() {
 
             if (photos.length > 0) {
                 const uploadPromises = photos.map(async (file) => {
-                    const fileExt = file.name.split('.').pop();
+                    const options = {
+                        maxSizeMB: 1, 
+                        maxWidthOrHeight: 1920,
+                        useWebWorker: true,
+                    };
+                    const compressedFile = await imageCompression(file, options);
+                    const fileExt = compressedFile.name.split('.').pop();
                     const randomString = Math.random()
                         .toString(36)
                         .substring(2, 9);
@@ -52,7 +70,7 @@ export default function ReviewWritePage() {
 
                     const { data, error: uploadError } = await supabase.storage
                         .from('review_photos')
-                        .upload(uniqueFileName, file);
+                        .upload(uniqueFileName, compressedFile);
 
                     if (uploadError) throw uploadError;
 
@@ -79,7 +97,9 @@ export default function ReviewWritePage() {
             ]);
 
             if (dbError) throw dbError;
-            alert('리뷰를 등록해주셔서 감사합니다! 리뷰는 검수 후 바로 등록됩니다.');
+            alert(
+                '리뷰를 등록해주셔서 감사합니다! 리뷰는 검수 후 바로 등록됩니다.'
+            );
 
             setSelectedPlace(null);
             setRating(0);
@@ -111,7 +131,7 @@ export default function ReviewWritePage() {
                 <div className="bg-white min-h-screen">
                     <form
                         onSubmit={handleSearch}
-                        className="flex items-center px-4 py-3 border-b"
+                        className="flex items-center px-4 py-3 border-b border-gray-300"
                     >
                         <input
                             type="text"
@@ -175,17 +195,61 @@ export default function ReviewWritePage() {
                     </p>
 
                     <div className="mb-6 bg-white p-4 rounded-xl shadow-sm">
-                        <label className="block font-bold mb-2">별점</label>
-                        <div className="flex gap-2">
-                            {[1, 2, 3, 4, 5].map((num) => (
-                                <button
-                                    key={num}
-                                    onClick={() => setRating(num)}
-                                    className={`px-4 py-2 rounded-lg font-bold ${rating === num ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-400'}`}
-                                >
-                                    {num}점
-                                </button>
-                            ))}
+                        <label className="block font-bold mb-2 text-gray-800">
+                            별점{' '}
+                            <span className="text-blue-500">
+                                {rating > 0 ? `${rating}점` : ''}
+                            </span>
+                        </label>
+
+                        <div
+                            className="flex gap-1"
+                            onMouseLeave={() => setHoverRating(0)}
+                        >
+                            {[1, 2, 3, 4, 5].map((num) => {
+                                const displayScore =
+                                    hoverRating > 0 ? hoverRating : rating;
+
+                                // 보여줄 이미지 결정 로직
+                                let starImage = '/star_empty.png'; // 텅 빈 별 이미지 경로
+                                if (displayScore >= num) {
+                                    starImage = '/star_full.png'; // 꽉 찬 별 이미지 경로
+                                } else if (displayScore >= num - 0.5) {
+                                    starImage = '/star_half.png'; // 반쪽 별 이미지 경로
+                                }
+
+                                return (
+                                    <div
+                                        key={num}
+                                        className="relative w-10 h-10"
+                                    >
+                                        {/* 1. 눈에 보이는 별 이미지 */}
+                                        <img
+                                            src={starImage}
+                                            alt={`${num}점 별`}
+                                            className="w-full h-full object-contain pointer-events-none transition-all duration-200"
+                                        />
+
+                                        {/* 2. 투명한 왼쪽 클릭 영역 (0.5점) */}
+                                        <div
+                                            className="absolute top-0 left-0 w-1/2 h-full cursor-pointer z-10"
+                                            onMouseEnter={() =>
+                                                setHoverRating(num - 0.5)
+                                            }
+                                            onClick={() => setRating(num - 0.5)}
+                                        />
+
+                                        {/* 3. 투명한 오른쪽 클릭 영역 (1.0점) */}
+                                        <div
+                                            className="absolute top-0 right-0 w-1/2 h-full cursor-pointer z-10"
+                                            onMouseEnter={() =>
+                                                setHoverRating(num)
+                                            }
+                                            onClick={() => setRating(num)}
+                                        />
+                                    </div>
+                                );
+                            })}
                         </div>
                     </div>
 
@@ -198,7 +262,7 @@ export default function ReviewWritePage() {
                             multiple
                             accept="image/*"
                             onChange={handlePhotoChange}
-                            className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition"
+                            className="block w-full text-transparent file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition"
                         />
 
                         {photos.length > 0 && (
@@ -208,13 +272,15 @@ export default function ReviewWritePage() {
                                         key={index}
                                         className="relative w-24 h-24 flex-shrink-0"
                                     >
-                                        <Image
-                                            src={URL.createObjectURL(file)}
-                                            alt="미리보기"
-                                            className="mt-2 object-cover rounded-lg border border-gray-200"
-                                            width={96}
-                                            height={96}
-                                        />
+                                        {previewUrls[index] && (
+                                            <Image
+                                                src={previewUrls[index]}
+                                                alt="미리보기"
+                                                className="mt-2 object-cover rounded-lg border border-gray-200"
+                                                width={96}
+                                                height={96}
+                                            />
+                                        )}
 
                                         <button
                                             type="button"
@@ -242,13 +308,13 @@ export default function ReviewWritePage() {
                         <textarea
                             value={content}
                             onChange={(e) => setContent(e.target.value)}
-                            className="w-full h-32 p-3 border border-gray-400 rounded-lg outline-none focus:ring-1 focus:ring-blue-500 resize-none"
+                            className="w-full h-32 p-3 border border-gray-300 rounded-lg outline-none focus:ring-1 focus:ring-blue-500 resize-none"
                             placeholder="음식 맛, 분위기, 친절도 등을 자유롭게 적어주세요!"
                         />
                     </div>
 
                     <button
-                        className="w-full bg-blue-600 text-white font-bold py-4 rounded-xl hover:bg-blue-700 transition"
+                        className="w-full bg-[#111FA2] text-white font-bold py-4 rounded-xl hover:bg-blue-700 transition"
                         onClick={handleSubmitReview}
                     >
                         리뷰 등록하기
