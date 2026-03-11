@@ -11,6 +11,8 @@ interface Review {
     content: string;
     image_urls: string[] | null;
     created_at: string;
+    liked_users: string[] | null;
+    disliked_users: string[] | null;
 }
 
 export default function StoreDetailPage({
@@ -25,11 +27,16 @@ export default function StoreDetailPage({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [reviews, setReviews] = useState<any>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [myDeviceId, setMyDeviceId] = useState('');
 
-    {
-        /* supabase 사용 코드 */
-    }
     useEffect(() => {
+        let deviceId = localStorage.getItem('hongik_devide_id');
+        if (!deviceId) {
+            deviceId = crypto.randomUUID();
+            localStorage.setItem('hongik_device_id', deviceId);
+        }
+        setMyDeviceId(deviceId);
+
         const fetchReviews = async () => {
             try {
                 const { data, error } = await supabase
@@ -50,6 +57,60 @@ export default function StoreDetailPage({
 
         fetchReviews();
     }, [storeId]);
+
+    const handleAction = async (
+        reviewId: string,
+        actionType: 'LIKE' | 'DISLIKE'
+    ) => {
+        const targetReview = reviews.find((r) => r.id === reviewId);
+        if (!targetReview) return;
+
+        let currentLikes = targetReview.liked_users || [];
+        let currentDislikes = targetReview.disliked_users || [];
+
+        const hasLiked = currentLikes.includes(myDeviceId);
+        const hasDisliked = currentDislikes.includes(myDeviceId);
+
+        if (actionType === 'LIKE') {
+            if (hasLiked) {
+                currentLikes = currentLikes.filter((id) => id !== myDeviceId);
+            } else {
+                currentLikes = [...currentLikes, myDeviceId];
+                currentDislikes = currentDislikes.filter(
+                    (id) => id !== myDeviceId
+                );
+            }
+        } else {
+            if (hasDisliked) {
+                currentDislikes = currentDislikes.filter(
+                    (id) => id !== myDeviceId
+                );
+            } else {
+                currentDislikes = [...currentDislikes, myDeviceId];
+                currentLikes = currentLikes.filter((id) => id !== myDeviceId);
+            }
+        }
+
+        setReviews((prev) =>
+            prev.map((r) =>
+                r.id === reviewId
+                    ? {
+                          ...r,
+                          liked_users: currentLikes,
+                          disliked_users: currentDislikes,
+                      }
+                    : r
+            )
+        );
+
+        await supabase
+            .from('reviews')
+            .update({
+                liked_users: currentLikes,
+                disliked_users: currentDislikes,
+            })
+            .eq('id', reviewId);
+    };
 
     const storeName = reviews.length > 0 ? reviews[0].restaurant_name : storeId;
 
@@ -98,56 +159,103 @@ export default function StoreDetailPage({
                             </h2>
                         </div>
 
-                        {reviews.map((review) => (
-                            <div
-                                key={review.id}
-                                className="bg-white p-5 rounded-xl shadow-sm border border-gray-100"
-                            >
-                                {/* 작성일 & 별점 */}
-                                <div className="flex justify-between items-center mb-3">
-                                    <div className="text-yellow-400 text-lg tracking-widest">
-                                        {'★'.repeat(review.rating)}
-                                        {'☆'.repeat(5 - review.rating)}
-                                    </div>
-                                    <span className="text-xs text-gray-400">
-                                        {new Date(
-                                            review.created_at
-                                        ).toLocaleDateString('ko-KR')}
-                                    </span>
-                                </div>
+                        {reviews.map((review) => {
+                            const likeCount = review.liked_users?.length || 0;
+                            const dislikeCount =
+                                review.disliked_users?.length || 0;
+                            const isLikedByMe =
+                                review.liked_users?.includes(myDeviceId);
+                            const isDislikedByMe =
+                                review.disliked_users?.includes(myDeviceId);
 
-                                {/* 리뷰 내용 */}
-                                <p className="text-gray-700 whitespace-pre-wrap leading-relaxed mb-4">
-                                    {review.content}
-                                </p>
-
-                                {/* 💡 첨부된 사진이 있다면 가로 스크롤로 보여주기! */}
-                                {review.image_urls &&
-                                    review.image_urls.length > 0 && (
-                                        <div className="flex gap-2 overflow-x-auto pb-2">
-                                            {review.image_urls.map(
-                                                (url, index) => (
-                                                    <div
-                                                        key={index}
-                                                        className="relative w-28 h-28 flex-shrink-0 rounded-lg overflow-hidden border border-gray-200"
-                                                    >
-                                                        {/* 주의: next/image 대신 일반 img 태그를 사용했습니다. 
-                                                    (외부 URL인 Supabase 스토리지를 띄우려면 next.config.js 설정이 필요하기 때문입니다) */}
-                                                        <img
-                                                            src={url}
-                                                            alt={`리뷰 사진 ${index + 1}`}
-                                                            className="w-full h-full object-cover"
-                                                        />
-                                                    </div>
-                                                )
-                                            )}
+                            return (
+                                <div
+                                    key={review.id}
+                                    className="bg-white p-5 rounded-xl shadow-sm border border-gray-100"
+                                >
+                                    {/* 작성일 & 별점 */}
+                                    <div className="flex justify-between items-center mb-3">
+                                        <div className="text-yellow-400 text-lg tracking-widest">
+                                            {'★'.repeat(review.rating)}
+                                            {'☆'.repeat(5 - review.rating)}
                                         </div>
-                                    )}
-                            </div>
-                        ))}
+                                        <span className="text-xs text-gray-400">
+                                            {new Date(
+                                                review.created_at
+                                            ).toLocaleDateString('ko-KR')}
+                                        </span>
+                                    </div>
+
+                                    {/* 리뷰 내용 */}
+                                    <p className="text-gray-700 whitespace-pre-wrap leading-relaxed mb-4">
+                                        {review.content}
+                                    </p>
+
+                                    {/* 💡 첨부된 사진이 있다면 가로 스크롤로 보여주기! */}
+                                    {review.image_urls &&
+                                        review.image_urls.length > 0 && (
+                                            <div className="flex gap-2 overflow-x-auto pb-2">
+                                                {review.image_urls.map(
+                                                    (url, index) => (
+                                                        <div
+                                                            key={index}
+                                                            className="relative w-28 h-28 flex-shrink-0 rounded-lg overflow-hidden border border-gray-200"
+                                                        >
+                                                            {/* 주의: next/image 대신 일반 img 태그를 사용했습니다. 
+                                                    (외부 URL인 Supabase 스토리지를 띄우려면 next.config.js 설정이 필요하기 때문입니다) */}
+                                                            <img
+                                                                src={url}
+                                                                alt={`리뷰 사진 ${index + 1}`}
+                                                                className="w-full h-full object-cover"
+                                                            />
+                                                        </div>
+                                                    )
+                                                )}
+                                            </div>
+                                        )}
+                                    <div className="flex gap-2 mt-4 pt-4 border-t border-gray-50">
+                                        <button
+                                            onClick={() =>
+                                                handleAction(review.id, 'LIKE')
+                                            }
+                                            className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-medium transition-colors border ${
+                                                isLikedByMe
+                                                    ? 'border-blue-500 bg-blue-50 text-blue-600'
+                                                    : 'border-gray-200 bg-white text-gray-500 hover:bg-gray-50'
+                                            }`}
+                                        >
+                                            <span>👍 도움됐어요</span>
+                                            {likeCount > 0 && (
+                                                <span>{likeCount}</span>
+                                            )}
+                                        </button>
+
+                                        <button
+                                            onClick={() =>
+                                                handleAction(
+                                                    review.id,
+                                                    'DISLIKE'
+                                                )
+                                            }
+                                            className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-sm font-medium transition-colors border ${
+                                                isDislikedByMe
+                                                    ? 'border-red-500 bg-red-50 text-red-600'
+                                                    : 'border-gray-200 bg-white text-gray-500 hover:bg-gray-50'
+                                            }`}
+                                        >
+                                            <span>👎 리뷰와 달라요</span>
+                                            {dislikeCount > 0 && (
+                                                <span>{dislikeCount}</span>
+                                            )}
+                                        </button>
+                                    </div>
+                                </div>
+                            );
+                        })}
                     </div>
                 )}
             </div>
         </main>
     );
 }
+    

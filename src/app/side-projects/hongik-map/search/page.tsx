@@ -43,7 +43,7 @@ export default function SearchPage() {
                 />
                 <button
                     type="submit"
-                    className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition"
+                    className="bg-[#5478FF] text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition"
                 >
                     검색
                 </button>
@@ -86,7 +86,7 @@ export default function SearchPage() {
                                             '/side-projects/hongik-map/map'
                                         );
                                     }}
-                                    className="px-4 py-2 bg-blue-50 text-blue-600 text-sm rounded-lg font-semibold whitespace-nowrap"
+                                    className="px-4 py-2 bg-blue-50 text-[#5478FF] text-sm rounded-lg font-semibold whitespace-nowrap"
                                 >
                                     지도에서 보기
                                 </button>

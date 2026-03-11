@@ -19,7 +19,7 @@ export default function NaverMap() {
     const mapInstance = useRef<any>(null);
     const searchMarker = useRef<any>(null);
     const [dbMarkers, setDbMarkers] = useState<any[]>([]);
-    const { selectedRestaurant, setSelectedRestaurant } = useRestaurantStore();
+    const { selectedRestaurant, setSelectedRestaurant, clearRestaurant } = useRestaurantStore();
 
     // 네이버지도 api에서 mapx, mapy를 전달할 때에는 네이버만의 규격에 맞춘 1천만이 넘어가는 숫자를 제공합니다.
     // 따라서 geocoding을 이용하지 않고 해당 좌표를 변환하기 위한 함수를 따로 작성하였습니다.
@@ -64,7 +64,7 @@ export default function NaverMap() {
 
         const mapOptions = {
             center: new naver.maps.LatLng(37.5518, 126.925),
-            zoom: 18,
+            zoom: 14,
             logoControl: false,
             mapDataControl: false,
             scaleControl: false,
@@ -74,7 +74,11 @@ export default function NaverMap() {
             mapElement.current,
             mapOptions
         );
-    }, [isLoaded]);
+        
+        window.naver.maps.Event.addListener(mapInstance.current, 'click', () => {
+            clearRestaurant();
+        });
+    }, [isLoaded, clearRestaurant]);
 
     useEffect(() => {
         if (!mapElement.current || !isLoaded || dbMarkers.length === 0) return;
@@ -82,12 +86,22 @@ export default function NaverMap() {
         dbMarkers.forEach((place) => {
             const position = getLatLng(Number(place.lat), Number(place.lng));
 
+            const markerHtml = `
+                <div style="position: absolute; transform: translate(-50%, -100%); display: flex; flex-direction: column; align-items: center; cursor: pointer;">
+                    <div style="background-color: white; padding: 4px 12px; border-radius: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); border: 1px solid #EFF6FF; font-weight: 700; color: #2563EB; font-size: 12px; white-space: nowrap;">
+                        ${place.restaurant_name}
+                    </div>
+                    <div style="width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-top: 8px solid white;"></div>
+                </div>
+            `;
+
             const marker = new window.naver.maps.Marker({
                 position: position,
                 map: mapInstance.current,
-                title: place.restaurant_name,
-                cursor: 'pointer',
-                clickable: true,
+                icon: {
+                    content: markerHtml,
+                    anchor: new window.naver.maps.Point(0, 0),
+                },
             });
 
             window.naver.maps.Event.addListener(marker, 'click', () => {
@@ -104,7 +118,15 @@ export default function NaverMap() {
     }, [isLoaded, dbMarkers]);
 
     useEffect(() => {
-        if (!mapInstance.current || !window.naver || !selectedRestaurant) return;
+        if (!mapInstance.current || !window.naver) return;
+
+        if (!selectedRestaurant) {
+            if (searchMarker.current) {
+                searchMarker.current.setMap(null);
+                searchMarker.current = null;
+            }
+            return;
+        }
 
         const targetLatLng = getLatLng(Number(selectedRestaurant.lat), Number(selectedRestaurant.lng));
 
@@ -117,9 +139,11 @@ export default function NaverMap() {
         searchMarker.current = new window.naver.maps.Marker({
             position: targetLatLng,
             map: mapInstance.current,
+            zIndex: 100,
         });
 
     }, [selectedRestaurant, isLoaded]);
+
     return (
         <div className="relative w-full h-screen">
             <Script
