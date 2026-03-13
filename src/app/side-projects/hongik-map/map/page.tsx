@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import BottomSheet from '@/src/components/map/BottomSheet';
-import NaverMap from '@/src/components/NaverMap';
+import NaverMap from '@/src/components/map/NaverMap';
 import StoreListPage from '@/src/components/map/StoreListPage';
 
 export default function MapTab() {

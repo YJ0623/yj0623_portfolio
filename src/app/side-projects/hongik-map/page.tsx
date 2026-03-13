@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
+import { useRestaurantStore } from '@/store/useRestaurantStore';
 import { supabase } from '@/utils/supabase';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -105,7 +106,7 @@ export default function HongikMapHome() {
                                             <Image
                                                 src={store.image_urls[0]}
                                                 alt="가게 사진"
-                                                sizes='64px'
+                                                sizes="64px"
                                                 fill
                                                 className="object-cover"
                                             />
@@ -115,13 +116,18 @@ export default function HongikMapHome() {
                                     </div>
 
                                     <div className="flex flex-col justify-center flex-1">
-                                        <h3 className="font-bold text-gray-900 line-clamp-1">
-                                            {store.restaurant_name}
-                                        </h3>
-                                        {/* 별점 대신 좋아요 수 표시 */}
-                                        <p className="text-sm text-gray-500 mt-1 font-medium">
-                                            {likeCount}명이 이 리뷰를 좋아했어요.
-                                        </p>
+                                        <Link
+                                            href={`/side-projects/hongik-map/store/${encodeURIComponent(store.restaurant_id)}`}
+                                        >
+                                            <h3 className="font-bold text-gray-900 line-clamp-1">
+                                                {store.restaurant_name}
+                                            </h3>
+                                            {/* 별점 대신 좋아요 수 표시 */}
+                                            <p className="text-sm text-gray-500 mt-1 font-medium">
+                                                {likeCount}명이 이 리뷰를
+                                                좋아했어요.
+                                            </p>
+                                        </Link>
                                     </div>
                                 </div>
                             );
@@ -155,8 +161,8 @@ export default function HongikMapHome() {
                                                 src={review.image_urls[0]}
                                                 alt="리뷰 사진"
                                                 fill
-                                                sizes='64px'
-                                                className='object-cover'
+                                                sizes="64px"
+                                                className="object-cover"
                                             />
                                         ) : (
                                             <span className="text-xl">🍽️</span>
@@ -164,14 +170,18 @@ export default function HongikMapHome() {
                                     </div>
 
                                     <div className="flex flex-col justify-center flex-1">
-                                        <div className="flex justify-between items-start mb-1">
-                                            <h3 className="font-bold text-gray-900 line-clamp-1">
-                                                {review.restaurant_name}
-                                            </h3>
-                                        </div>
-                                        <p className="text-gray-600 text-sm line-clamp-2">
-                                            {review.content}
-                                        </p>
+                                        <Link
+                                            href={`/side-projects/hongik-map/store/${encodeURIComponent(review.restaurant_id)}`}
+                                        >
+                                            <div className="flex justify-between items-start mb-1">
+                                                <h3 className="font-bold text-gray-900 line-clamp-1">
+                                                    {review.restaurant_name}
+                                                </h3>
+                                            </div>
+                                            <p className="text-gray-600 text-sm line-clamp-2">
+                                                {review.content}
+                                            </p>
+                                        </Link>
                                     </div>
                                 </div>
                             );
