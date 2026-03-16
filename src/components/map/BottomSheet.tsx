@@ -11,6 +11,7 @@ export default function BottomSheet() {
 
     const [reviewCount, setReviewCount] = useState(0);
     const [rating, setRating] = useState(0.0);
+    const [category, setCategory] = useState<string | null>(null);
     const [imageUrl, setImageUrl] = useState<string | null>(null);
 
     useEffect(() => {
@@ -19,22 +20,26 @@ export default function BottomSheet() {
         const fetchStoreStats = async () => {
             const { data, error } = await supabase
                 .from('reviews')
-                .select('rating, image_urls')
+                .select('rating, image_urls, category')
                 .eq('restaurant_id', selectedRestaurant.id)
                 .eq('status', 'APPROVED');
 
             if (data && data.length > 0) {
                 setReviewCount(data.length);
-                
+
                 const totalRating = data.reduce((acc, curr) => acc + curr.rating, 0);
                 setRating(Number((totalRating / data.length).toFixed(1)));
 
                 const reviewWithImage = data.find(r => r.image_urls && r.image_urls.length > 0);
                 setImageUrl(reviewWithImage ? reviewWithImage.image_urls[0] : null);
+
+                const reviewWithCategory = data.find(r => r.category);
+                setCategory(reviewWithCategory ? reviewWithCategory.category : null);
             } else {
                 setReviewCount(0);
                 setRating(0.0);
                 setImageUrl(null);
+                setCategory(null);
             }
         };
 
@@ -45,7 +50,7 @@ export default function BottomSheet() {
 
     return (
         <div className="absolute bottom-20 left-4 right-4 bg-white z-40 p-5 shadow-[0_8px_30px_rgb(0,0,0,0.12)] rounded-2xl border border-gray-100">
-            <button 
+            <button
                 onClick={clearRestaurant}
                 className="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600"
             >
@@ -62,9 +67,15 @@ export default function BottomSheet() {
                 </div>
 
                 <div className="flex flex-col justify-center flex-1 pr-6">
-                    <h3 className="text-xl font-bold text-gray-900 line-clamp-1">
+                    <h3 className="flex flex-row items-end text-[18px] font-bold text-gray-900 line-clamp-1">
                         {selectedRestaurant.name}
+                        {category && (
+                            <span className="text-[11px] text-gray-400 px-1 py-0.5 rounded-md whitespace-nowrap shrink-0">
+                                {category}
+                            </span>
+                        )}
                     </h3>
+                    
                     
                     {reviewCount > 0 ? (
                         <p className="text-sm text-gray-600 mt-1 font-medium">

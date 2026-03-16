@@ -64,7 +64,7 @@ export default function HongikMapHome() {
 
     return (
         <main className="min-h-screen bg-gray-50 pb-24">
-            <section className="bg-[#5478FF] px-4 pt-6 pb-6 shadow-md rounded-b-3xl">
+            <section className="bg-[#5478FF] px-4 pt-2 pb-6 shadow-md rounded-b-3xl">
                 <h1 className="font-bold text-white text-lg mb-4 ml-1">
                     홍대생들의 찐 맛집을 공유해주세요!
                 </h1>
@@ -138,7 +138,7 @@ export default function HongikMapHome() {
 
             <section className="px-4 mt-8">
                 <h2 className="text-lg font-bold mb-4">
-                    가장 최근 올라온 리뷰를 둘러보세요
+                    가장 최근 올라온 리뷰를 둘러보세요!
                 </h2>
 
                 {isLoading ? (

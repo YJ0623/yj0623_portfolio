@@ -7,16 +7,20 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
+const CATEGORIES = ['한식', '중식', '일식', '양식', '카페', '디저트', '기타'];
+
 export default function ReviewWritePage() {
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState<any[]>([]);
     const [selectedPlace, setSelectedPlace] = useState<any | null>(null);
     const router = useRouter();
+    const [category, setCategory] = useState('');
     const [rating, setRating] = useState(0);
     const [hoverRating, setHoverRating] = useState(0);
     const [content, setContent] = useState('');
     const [photos, setPhotos] = useState<File[]>([]);
     const [previewUrls, setPreviewUrls] = useState<string[]>([]);
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
     useEffect(() => {
         const newUrls = photos.map((file) => URL.createObjectURL(file));
@@ -57,11 +61,14 @@ export default function ReviewWritePage() {
             if (photos.length > 0) {
                 const uploadPromises = photos.map(async (file) => {
                     const options = {
-                        maxSizeMB: 1, 
+                        maxSizeMB: 1,
                         maxWidthOrHeight: 1920,
                         useWebWorker: true,
                     };
-                    const compressedFile = await imageCompression(file, options);
+                    const compressedFile = await imageCompression(
+                        file,
+                        options
+                    );
                     const fileExt = compressedFile.name.split('.').pop();
                     const randomString = Math.random()
                         .toString(36)
@@ -87,6 +94,7 @@ export default function ReviewWritePage() {
                 {
                     restaurant_id: addressId,
                     restaurant_name: cleanTitle,
+                    category: category,
                     rating: rating,
                     content: content,
                     status: 'PENDING',
@@ -193,6 +201,41 @@ export default function ReviewWritePage() {
                     <p className="text-gray-500 mb-8">
                         이곳에 대한 솔직한 리뷰를 남겨주세요.
                     </p>
+
+                    <div className="mb-8 relative">
+                        <label className="text-[15px] font-medium text-[#333] mb-2 block">
+                            매장 카테고리
+                        </label>
+                        <button
+                            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                            className="w-full h-[50px] border border-gray-300 rounded-[10px] px-4 flex justify-between items-center bg-white"
+                        >
+                            <span
+                                className={
+                                    category ? 'text-black' : 'text-gray-400'
+                                }
+                            >
+                                {category || '선택해주세요'}
+                            </span>
+                            <div className="">↓</div>
+                        </button>
+                        {isDropdownOpen && (
+                            <div className="absolute z-20 w-full bg-white border border-gray-200 rounded-lg shadow-lg mt-1 max-h-[200px] overflow-y-auto">
+                                {CATEGORIES.map((category) => (
+                                    <div
+                                        key={category}
+                                        className="px-4 py-3 hover:bg-gray-50 cursor-pointer text-sm"
+                                        onClick={() => {
+                                            setCategory(category);
+                                            setIsDropdownOpen(false);
+                                        }}
+                                    >
+                                        {category}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
 
                     <div className="mb-6 bg-white p-4 rounded-xl shadow-sm">
                         <label className="block font-bold mb-2 text-gray-800">
