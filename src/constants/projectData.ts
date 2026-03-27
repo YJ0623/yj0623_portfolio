@@ -1,6 +1,9 @@
 import { StaticImageData } from "next/image";
 import dango_main from '../app/assets/dango_main.png';
-import glow_main from '../app/assets/glow_main.jpeg';
+import cork_board from '../app/assets/cork-board.png';
+import blackhole from '../app/assets/blackhole_small.png';
+import dashboardImage from '../app/assets/dashBoardImage.png';
+import hongik_map from '../app/assets/hongik_map.png'
 
 export interface ProjectData {
   id: number;
@@ -16,6 +19,13 @@ export interface ProjectData {
     figma?: string;
     deploy?: string;
   };
+}
+
+export interface SideProjectsData {
+  id: number;
+  title: string;
+  image: StaticImageData;
+  link: string;
 }
 
 export const projectsData: ProjectData[] = [
@@ -37,21 +47,31 @@ export const projectsData: ProjectData[] = [
       figma: 'https://www.figma.com/design/8SRYLupxiDZ27AIssh2RLR/%EB%8D%B0%EB%AA%A8%EB%8D%B0%EC%9D%B4?node-id=1822-2065&p=f&m=dev',
     },
   },
+];
+
+export const sideProjectsData: SideProjectsData[] = [
+  {
+    id: 1,
+    title: 'vision_board',
+    image: cork_board,
+    link: 'https://www.yj0623-portfolio.com/side-projects/visionboard'
+  },
   {
     id: 2,
-    title: 'Glow',
-    desc: {
-      ko: '교내 미대생들이 전시 공간을 쉽게 확보하고 홍보하며 정보를 얻을 수 있도록 돕는 플랫폼입니다.',
-      en: 'A platform helping art students secure exhibition spaces and promote their work.',
-      ja: '美大生が展示スペースを簡単に確保し、広報や情報を得られるように支援するプラットフォームです。',
-    },
-    role: 'Developed with Backend Developer, Designer, Frontend peer',
-    image: glow_main,
-    tech: ['React'],
-    links: {
-      deploy: 'https://glowarts.online/',
-      github: 'https://github.com/yookoh-sam/yookohsam_front',
-      figma: 'https://figma.com/file/your-file',
-    },
+    title: 'blackhole',
+    image: blackhole,
+    link: 'https://www.yj0623-portfolio.com/side-projects/magneticbutton'
   },
-];
+  {
+    id: 3,
+    title: 'dashboardImage',
+    image: dashboardImage,
+    link: 'https://www.yj0623-portfolio.com/side-projects/dashboard'
+  },
+  {
+    id: 4,
+    title: 'hongikMap',
+    image: hongik_map,
+    link: 'https://www.yj0623-portfolio.com/side-projects/hongik-map'
+  }
+]

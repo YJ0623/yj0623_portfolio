@@ -19,7 +19,8 @@ export default function NaverMap() {
     const mapInstance = useRef<any>(null);
     const searchMarker = useRef<any>(null);
     const [dbMarkers, setDbMarkers] = useState<any[]>([]);
-    const { selectedRestaurant, setSelectedRestaurant, clearRestaurant } = useRestaurantStore();
+    const { selectedRestaurant, setSelectedRestaurant, clearRestaurant } =
+        useRestaurantStore();
 
     // 네이버지도 api에서 mapx, mapy를 전달할 때에는 네이버만의 규격에 맞춘 1천만이 넘어가는 숫자를 제공합니다.
     // 따라서 geocoding을 이용하지 않고 해당 좌표를 변환하기 위한 함수를 따로 작성하였습니다.
@@ -27,12 +28,12 @@ export default function NaverMap() {
         // 1. 최신 스펙: 1천만 이상 (위경도 * 10,000,000)
         if (lat > 10000000) {
             return new window.naver.maps.LatLng(lat / 10000000, lng / 10000000);
-        } 
+        }
         // 2. 과거 스펙: 1천 이상 ~ 1천만 미만 (TM128)
         else if (lat > 1000) {
             const tm128 = new window.naver.maps.Point(lng, lat);
             return window.naver.maps.TransCoord.fromTM128ToLatLng(tm128);
-        } 
+        }
         // 3. 정상 위경도 (37.xxx, 126.xxx)
         return new window.naver.maps.LatLng(lat, lng);
     };
@@ -68,16 +69,25 @@ export default function NaverMap() {
             logoControl: false,
             mapDataControl: false,
             scaleControl: false,
+            zoomControl: true,
+            zoomControlOptions: {
+                style: naver.maps.ZoomControlStyle.SMALL,
+                position: naver.maps.Position.LEFT_TOP,
+            },
         };
 
         mapInstance.current = new naver.maps.Map(
             mapElement.current,
             mapOptions
         );
-        
-        window.naver.maps.Event.addListener(mapInstance.current, 'click', () => {
-            clearRestaurant();
-        });
+
+        window.naver.maps.Event.addListener(
+            mapInstance.current,
+            'click',
+            () => {
+                clearRestaurant();
+            }
+        );
     }, [isLoaded, clearRestaurant]);
 
     useEffect(() => {
@@ -111,7 +121,7 @@ export default function NaverMap() {
                     lat: Number(place.lat),
                     lng: Number(place.lng),
                 });
-                
+
                 mapInstance.current.panTo(position);
             });
         });
@@ -128,7 +138,10 @@ export default function NaverMap() {
             return;
         }
 
-        const targetLatLng = getLatLng(Number(selectedRestaurant.lat), Number(selectedRestaurant.lng));
+        const targetLatLng = getLatLng(
+            Number(selectedRestaurant.lat),
+            Number(selectedRestaurant.lng)
+        );
 
         mapInstance.current.panTo(targetLatLng);
 
@@ -141,7 +154,6 @@ export default function NaverMap() {
             map: mapInstance.current,
             zIndex: 100,
         });
-
     }, [selectedRestaurant, isLoaded]);
 
     return (
@@ -151,7 +163,7 @@ export default function NaverMap() {
                 src={`https://openapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=${process.env.NEXT_PUBLIC_NAVER_CLIENT_ID}&submodules=geocoder`}
                 onReady={() => setIsLoaded(true)}
             />
-            <div ref={mapElement} className="w-full h-screen relative" />
+            <div ref={mapElement} className="w-full h-screen mt-10 relative" />
         </div>
     );
 }

@@ -2,7 +2,11 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useLanguageStore } from '@/store/useLanguageStore';
-import { ProjectData, projectsData } from '../constants/projectData';
+import {
+    ProjectData,
+    projectsData,
+    sideProjectsData,
+} from '../constants/projectData';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -15,13 +19,14 @@ import { BsLink45Deg } from 'react-icons/bs';
 
 export const MainPage = () => {
     const { t, language } = useLanguageStore();
-    const [selectedProject, setSelectedProject] = useState<ProjectData | null>(null);
+    const [selectedProject, setSelectedProject] = useState<ProjectData | null>(
+        null
+    );
 
     return (
         <div className="bg-[#EFECE3] h-screen overflow-y-scroll snap-y snap-mandatory scroll-smooth font-sans selection:bg-[#BF092F] selection:text-white relative">
-            
             <Navbar />
-            
+
             {selectedProject && (
                 <ProjectModal
                     project={selectedProject}
@@ -35,8 +40,18 @@ export const MainPage = () => {
                     <TypingTitle />
                 </div>
                 <div className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce">
-                    <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                    <svg
+                        className="w-6 h-6 text-gray-400"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M19 14l-7 7m0 0l-7-7m7 7V3"
+                        />
                     </svg>
                 </div>
             </section>
@@ -78,24 +93,44 @@ export const MainPage = () => {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         {projectsData.map((project) => (
-                            <div key={project.id} className="bg-white h-[500px] rounded-2xl shadow-lg hover:-translate-y-2 transition duration-300 overflow-hidden group flex flex-col">
+                            <div
+                                key={project.id}
+                                className="bg-white h-[500px] rounded-2xl hover:-translate-y-2 transition duration-300 overflow-hidden group flex flex-col"
+                            >
                                 <div className="h-3/5 bg-gray-200 overflow-hidden relative">
-                                    <Image src={project.image} alt={project.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                                    <Image
+                                        src={project.image}
+                                        alt={project.title}
+                                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                    />
                                 </div>
                                 <div className="p-6 flex flex-col justify-between flex-1">
                                     <div>
-                                        <h3 className="text-2xl font-bold mb-2">{project.title}</h3>
-                                        <p className="text-gray-600 mb-2 line-clamp-2 text-sm md:text-base">{project.desc[language]}</p>
-                                        <p className="text-gray-400 text-xs mb-4">{project.role}</p>
+                                        <h3 className="text-2xl font-bold mb-2">
+                                            {project.title}
+                                        </h3>
+                                        <p className="text-gray-600 mb-2 line-clamp-2 text-sm md:text-base">
+                                            {project.desc[language]}
+                                        </p>
+                                        <p className="text-gray-400 text-xs mb-4">
+                                            {project.role}
+                                        </p>
                                     </div>
                                     <div className="flex flex-col gap-4">
                                         <div className="flex flex-wrap gap-2">
                                             {project.tech.map((t) => (
-                                                <span key={t} className="text-xs font-bold text-[#BF092F] bg-[#BF092F]/10 px-2 py-1 rounded">{t}</span>
+                                                <span
+                                                    key={t}
+                                                    className="text-xs font-bold text-[#BF092F] bg-[#BF092F]/10 px-2 py-1 rounded"
+                                                >
+                                                    {t}
+                                                </span>
                                             ))}
                                         </div>
                                         <button
-                                            onClick={() => setSelectedProject(project)}
+                                            onClick={() =>
+                                                setSelectedProject(project)
+                                            }
                                             className="cursor-pointer text-center w-full py-2 rounded-lg border border-gray-300 font-bold text-sm text-gray-700 hover:bg-[#BF092F] hover:text-white hover:border-[#BF092F] transition-colors duration-200 flex items-center justify-center gap-2"
                                         >
                                             {t.projects.viewMore}
@@ -111,23 +146,57 @@ export const MainPage = () => {
 
             <section
                 id="additional"
-                className="min-h-screen w-full snap-start flex flex-col items-center justify-center px-6 md:px-20 relative"
+                className="min-h-screen w-full snap-start flex flex-col items-center justify-center px-6 md:px-20 relative overflow-hidden"
             >
-                <div className="bg-black text-white rounded-3xl p-12 md:p-20 shadow-xl w-full max-w-5xl">
-                    <h2 className="text-3xl md:text-5xl font-bold mb-6">{t.additional.title}</h2>
-                    <p className="text-lg opacity-90 mb-8 whitespace-pre-line">{t.additional.desc}</p>
-                    <Link href={'/side-projects'} className="cursor-pointer">
-                        <button className="bg-white text-black px-8 py-4 rounded-full font-bold text-lg hover:bg-gray-100 transition shadow-lg cursor-pointer">
-                            {t.additional.btn}
-                        </button>
-                    </Link>
+                {/* 배경 타이틀 - 장식용 큰 텍스트 */}
+                <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-[0.03] select-none pointer-events-none">
+                    <h2 className="text-[15vw] font-black whitespace-nowrap">
+                        PLAYGROUND
+                    </h2>
+                </div>
+
+                <div className="relative w-full max-w-5xl h-[600px] flex items-center justify-center">
+                    <h2 className="absolute top-0 left-0 text-2xl font-bold border-b-2 border-[#BF092F] pb-2">
+                        Visual Archive
+                    </h2>
+
+                    {/* 이미지들을 무작위인 듯 정교하게 배치 */}
+                    {sideProjectsData.map((project, index) => (
+                        <Link
+                            href={project.link}
+                            key={project.id}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={`
+                    absolute group cursor-pointer transition-all duration-500 ease-out
+                    hover:z-50 hover:scale-110
+                    ${index % 2 === 0 ? 'rotate-3 hover:rotate-0' : '-rotate-3 hover:rotate-0'}
+                `}
+                            style={{
+                                top: `${10 + index * 15}%`,
+                                left: `${index * 20}%`,
+                                width: '400px',
+                            }}
+                        >
+                            {/* 사진 프레임 효과 */}
+                            <div className="rounded-sm transform transition group-hover:-translate-y-2">
+                                <div className="relative w-full aspect-video overflow-hidden">
+                                    <Image
+                                        src={project.image}
+                                        alt={project.title}
+                                        fill
+                                        className="object-contain"
+                                    />
+                                </div>
+                            </div>
+                        </Link>
+                    ))}
                 </div>
 
                 <footer className="absolute bottom-0 w-full py-10 text-center text-gray-500 text-sm">
                     {t.footer}
                 </footer>
             </section>
-
         </div>
     );
 };
