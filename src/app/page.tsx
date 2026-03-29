@@ -161,36 +161,61 @@ export const MainPage = () => {
                     </h2>
 
                     {/* 이미지들을 무작위인 듯 정교하게 배치 */}
-                    {sideProjectsData.map((project, index) => (
-                        <Link
-                            href={project.link}
-                            key={project.id}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className={`
-                    absolute group cursor-pointer transition-all duration-500 ease-out
-                    hover:z-50 hover:scale-110
-                    ${index % 2 === 0 ? 'rotate-3 hover:rotate-0' : '-rotate-3 hover:rotate-0'}
-                `}
-                            style={{
-                                top: `${10 + index * 15}%`,
-                                left: `${index * 20}%`,
-                                width: '400px',
-                            }}
-                        >
-                            {/* 사진 프레임 효과 */}
-                            <div className="rounded-sm transform transition group-hover:-translate-y-2">
-                                <div className="relative w-full aspect-video overflow-hidden">
-                                    <Image
-                                        src={project.image}
-                                        alt={project.title}
-                                        fill
-                                        className="object-contain"
-                                    />
+                    {sideProjectsData.map((project, index) => {
+                        // 모바일에서 겹치지 않고 예쁘게 분산되도록 4개의 고정 좌표를 준비합니다.
+                        const mobilePositions = [
+                            { top: '15%', left: '5%' },
+                            { top: '30%', left: '45%' },
+                            { top: '55%', left: '10%' },
+                            { top: '70%', left: '40%' },
+                        ];
+
+                        // 인덱스에 맞춰 모바일/데스크탑 위치 값을 할당합니다.
+                        const mPos =
+                            mobilePositions[index % mobilePositions.length];
+                        const dTop = `${10 + index * 15}%`;
+                        const dLeft = `${index * 20}%`;
+
+                        return (
+                            <Link
+                                href={project.link}
+                                key={project.id}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className={`
+                        absolute group cursor-pointer transition-all duration-500 ease-out
+                        hover:z-50 hover:scale-110
+                        ${index % 2 === 0 ? 'rotate-3 hover:rotate-0' : '-rotate-3 hover:rotate-0'}
+                        /* 모바일: 180px, 데스크탑(md): 400px */
+                        w-[180px] md:w-[400px]
+                        /* CSS 변수를 Tailwind 클래스에서 읽어와 위치 적용 */
+                        top-[var(--m-top)] left-[var(--m-left)] 
+                        md:top-[var(--d-top)] md:left-[var(--d-left)]
+                    `}
+                                style={
+                                    {
+                                        // React에서 커스텀 CSS 변수를 전달하는 깔끔한 방법입니다.
+                                        '--m-top': mPos.top,
+                                        '--m-left': mPos.left,
+                                        '--d-top': dTop,
+                                        '--d-left': dLeft,
+                                    } as React.CSSProperties
+                                }
+                            >
+                                {/* 사진 프레임 효과 */}
+                                <div className="rounded-sm transform transition group-hover:-translate-y-2">
+                                    <div className="relative w-full aspect-video overflow-hidden">
+                                        <Image
+                                            src={project.image}
+                                            alt={project.title}
+                                            fill
+                                            className="object-cover md:object-contain" // 모바일의 작은 프레임에서는 cover가 더 예쁠 수 있습니다.
+                                        />
+                                    </div>
                                 </div>
-                            </div>
-                        </Link>
-                    ))}
+                            </Link>
+                        );
+                    })}
                 </div>
 
                 <footer className="absolute bottom-0 w-full py-10 text-center text-gray-500 text-sm">
