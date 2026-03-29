@@ -5,7 +5,7 @@ import Link from 'next/link';
 export default function DashBoard() {
     return (
         <div className="min-h-screen bg-[#EFECE3] p-5">
-            <Link href="/side-projects" className="font-semibold text-2xl">
+            <Link href="/" className="font-semibold text-2xl">
                 ← Back
             </Link>
             <div className="flex mx-auto justify-center">

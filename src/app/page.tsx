@@ -183,7 +183,7 @@ export const MainPage = () => {
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className={`
-                        absolute group cursor-pointer transition-all duration-500 ease-out
+                        absolute group cursor-pointer transition-all duration-500 ease-out mt-10
                         hover:z-50 hover:scale-110
                         ${index % 2 === 0 ? 'rotate-3 hover:rotate-0' : '-rotate-3 hover:rotate-0'}
                         /* 모바일: 180px, 데스크탑(md): 400px */

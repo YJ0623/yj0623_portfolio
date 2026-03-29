@@ -6,7 +6,7 @@ export default function Page() {
     return (
         <div className="w-full h-full">
             <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-black">
-                <Link href="/side-projects" className="font-semibold text-2xl text-white z-15 absolute top-5 left-5">
+                <Link href="/" className="font-semibold text-2xl text-white z-15 absolute top-5 left-5">
                     ← Back
                 </Link>
                 <ParticleCanvas />

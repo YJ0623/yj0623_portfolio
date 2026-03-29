@@ -108,7 +108,7 @@ export default function VisionBoard() {
             {/* 헤더 영역 - 반응형 */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0 mb-4 sm:mb-0">
                 <Link
-                    href="/side-projects"
+                    href="/"
                     className="font-semibold text-base sm:text-lg md:text-xl z-50 relative hover:opacity-70 transition-opacity"
                 >
                     ← Back
